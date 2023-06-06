@@ -2,6 +2,8 @@ import os
 from PIL import Image
 import numpy as np
 import cv2 as cv
+from skimage import img_as_float32, img_as_int, io
+
 
 COLORI=1
 SCALA_DI_GRIGIO=2
@@ -71,3 +73,37 @@ def carica_foto(path_fiori, grandezza, libreria):
             foto_associate.append(fiore)
             labels.append(classi_fiori[cartella])
     return (foto_associate, labels)
+
+def load_image(library, image_path):
+    img = None
+    if library=="pil":
+        img = Image.open(image_path)
+    elif library=="opencv":
+        img = cv.imread(image_path)
+    elif library=="skimage":
+        img = io.imread(image_path)
+    else:
+        raise Exception("Library "+library+ " not supported")
+    return img
+
+def write_image(library, image_path, img):
+    if library=="pil":
+        img.save(image_path)
+    elif library=="opencv":
+        cv.imwrite(image_path, img)
+    elif library=="skimage":
+        io.save(image_path, img)
+    else:
+        raise Exception("Library "+library+ " not supported")
+
+def load_images_from_folder(library, folder_path):
+    images_file_names = sorted(os.listdir(folder_path))
+    images = []
+    for image_file_name in images_file_names:
+        image_path = os.path.join(folder_path, image_file_name)
+        img = load_image(library, image_path)
+        images.append(img)
+    return images
+
+
+
